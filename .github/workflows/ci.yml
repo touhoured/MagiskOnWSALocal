@@ -19,7 +19,7 @@ jobs:
     - name: Build
       run: |
         cd scripts
-        sudo build.sh --remove-amazon --compress-format 7z
+        sudo ./build.sh --remove-amazon --compress-format 7z
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
