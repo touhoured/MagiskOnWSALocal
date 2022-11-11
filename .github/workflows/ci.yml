@@ -13,13 +13,13 @@ jobs:
       uses: actions/checkout@v3
     - name: Get current date
       id: date
-      run: echo ::set-output name=today::$(date +%F)
-    - name: install dependencies
-      run : sudo apt install setools lzip wine patchelf e2fsprogs aria2 python3 attr
-    - name: build
+      run: echo "date=$(date +%F)" >> $GITHUB_ENV
+    - name: Install dependencies
+      run : sudo apt -y install setools lzip wine patchelf e2fsprogs aria2 python3 attr
+    - name: Build
       run: sudo scripts/build.sh --remove-amazon --compress-format 7z
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ steps.date.outputs.today }}
+        tag_name: ${{ env.date }}
         file: output/*.7z
