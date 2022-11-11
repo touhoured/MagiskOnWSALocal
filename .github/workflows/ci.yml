@@ -15,8 +15,8 @@ jobs:
       run: echo "date=$(date +%F)" >> $GITHUB_ENV
     - name: Get Magisk alpha
       run: |
-        mkdir ../download
-        curl https://raw.githubusercontent.com/vvb2060/magisk_files/alpha/app-release.apk -o ../download/app-debug.apk
+        mkdir download
+        curl https://raw.githubusercontent.com/vvb2060/magisk_files/alpha/app-release.apk -o download/app-debug.apk
     - name: Install dependencies
       run : sudo apt install setools lzip wine patchelf e2fsprogs aria2 python3 attr
     - name: Build
