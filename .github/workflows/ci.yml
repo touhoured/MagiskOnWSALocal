@@ -16,7 +16,11 @@ jobs:
       id: date
       run: echo ::set-output name=today::$(date +%F)
       
+    - name: build
+      run: sudo scripts/build.sh --remove-amazon --compress-format 7z
+      
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.date.outputs.today }}
+        file: output/*.7z
