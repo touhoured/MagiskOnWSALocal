@@ -15,9 +15,11 @@ jobs:
       id: date
       run: echo "date=$(date +%F)" >> $GITHUB_ENV
     - name: Install dependencies
-      run : sudo apt -y install setools lzip wine patchelf e2fsprogs aria2 python3 attr
+      run : sudo apt install setools lzip wine patchelf e2fsprogs aria2 python3 attr
     - name: Build
-      run: sudo scripts/build.sh --remove-amazon --compress-format 7z
+      run: |
+        cd scripts
+        sudo build.sh --remove-amazon --compress-format 7z
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
