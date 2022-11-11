@@ -22,7 +22,7 @@ jobs:
     - name: Build
       run: |
         cd scripts
-        sudo ./build.sh --remove-amazon --compress-format 7z --magisk-custom
+        sudo ./build.sh --remove-amazon --compress --magisk-custom --release-type WIF
     - name: Release
       uses: softprops/action-gh-release@v1
       with:
