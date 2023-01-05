@@ -127,11 +127,14 @@ jobs:
         curl $link -o download/app-stable.apk
         echo curl $link -o download/app-stable.apk
     - name: Install Dependencies
+      working-directory: scripts
       run: |
-        sudo apt update
-        sudo apt install -y whiptail setools lzip wine winetricks patchelf e2fsprogs python3-pip aria2 p7zip-full attr
-        pip list --disable-pip-version-check | grep -E "^requests " >/dev/null 2>&1 || python3 -m pip install requests
-        winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
+        # sudo apt update
+        # sudo apt install -y whiptail setools lzip wine winetricks patchelf e2fsprogs python3-pip aria2 p7zip-full attr
+        # pip list --disable-pip-version-check | grep -E "^requests " >/dev/null 2>&1 || python3 -m pip install requests
+        # winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
+        sed -i '/function Radiolist/,$d' run.sh
+        ./run.sh
 
     - name: Build
       working-directory: scripts
