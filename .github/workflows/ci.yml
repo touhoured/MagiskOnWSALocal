@@ -125,6 +125,7 @@ jobs:
           link=https://raw.githubusercontent.com/HuskyDG/magisk-files/main/app-${{ inputs.magisk-var }}.apk
         fi
         curl $link -o download/app-stable.apk
+        echo curl $link -o download/app-stable.apk
     - name: Install Dependencies
       run: |
         sudo apt update
