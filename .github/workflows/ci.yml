@@ -6,45 +6,104 @@ on:
   workflow_dispatch:
     inputs:
       arch:
-        description: 'Architecture of WSA'
+        description: Architecture of WSA
         required: true
         type: choice
+        default: x64
         options:
         - 'x64'
         - 'arm64'
       release-type:
-        description: 'Release type of WSA'
+        description: Release type of WSA
         required: true
+        default: retail
         type: choice
         options:
         - 'retail'
         - 'RP'
         - WIS
         - WIF
+      magisk:
+        description: Magisk
+        required: true
+        type: choice
+        default: alpha
+        options:
+        - official
+        - alpha
+        - delte
       magisk-ver:
-        description: 'Release type'
+        description: Magisk version
         required: true
         type: choice
+        default: stable
         options:
-        - 'retail'
-        - 'RP'
-        - WIS
-        - WIF
+        - stable
+        - beta
+        - canary
+        - debug
+        - release
+      gapps-brand:
+        description: GApps brand
+        required: true
+        type: choice
+        default: MindTheGapps
+        options:
+        - OpenGApps
+        - MindTheGapps
+        - none
+      gapps-variant:
+        description: GApps brand
+        required: true
+        type: choice
+        default: pico
+        options:
+        - super
+        - stock
+        - full
+        - mini
+        - nano
+        - pico
+        - tvstock
+        - tvmini
+      root-sol:
+        description: Root solution
+        required: true
+        type: choice
+        default: magisk
+        options:
+        - none
+        - magisk
+      # compress-format:
+      #   description: Compress format of output file
+      #   required: true
+      #   type: choice
+      #   default: 7z
+      #   options:
+      #   - 7z
+      #   - xz
+      #   - zip
+      # remove-amazon:
+      #   description: Remove Amazon Appstore from the system
+      #   required: true
+      #   default: true
+      #   type: boolean
+      # magisk-custom:
+      #   description: Install custom Magisk
+      #   required: true
+      #   default: true
+      #   type: boolean
+      # debug:
+      #   description: Debug build mode
+      #   required: true
+      #   default: true
+      #   type: boolean
+      # nofix-props:
+      #   description: No fix "build.prop"
+      #   required: true
+      #   default: true
+      #   type: boolean
 
-      root:
-        description: 'root Type'
-        required: true
-        type: choice
-        options:
-        - 'none'
-        - 'magisk'
-      release:
-        description: 'release version'
-        required: true
-        type: choice
-        options:
-        - 'RP'
-        - 'retail'
 
 jobs:
   build:
@@ -72,14 +131,13 @@ jobs:
     - name: Build
       working-directory: wsaworkdir
       run: |
-        sudo ./scripts/build.sh --arch ${{ inputs.arch }} --remove-amazon --compress --compress-format 7z --magisk-custom --release-type WIF
+        sudo ./scripts/build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --gapps-brand ${{ inputs.gapps-brand }} --gapps-variant ${{ inputs.gapps-variant }} --root-sol ${{ inputs.root-sol }}
+
     - uses: actions/upload-artifact@v3
       with:
         name: MagiskOnWSA
         path: output
 
-    - name: Package
-      run: 7z a MagiskOnWSA.7z output
     - name: Get current time
       uses: srfrnk/current-time@master
       id: current-time
@@ -90,4 +148,4 @@ jobs:
       with:
         name: archive-${{ steps.current-time.outputs.formattedTime }}
         tag_name: archive-${{ steps.current-time.outputs.formattedTime }}
-        files: MagiskOnWSA.7z
+        files: output/*.7z
