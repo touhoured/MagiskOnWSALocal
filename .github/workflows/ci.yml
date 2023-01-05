@@ -134,8 +134,10 @@ jobs:
         winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
 
     - name: Build
+      working-directory: scripts
       run: |
-        sudo ./scripts/build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --gapps-brand ${{ inputs.gapps-brand }} --gapps-variant ${{ inputs.gapps-variant }} --root-sol ${{ inputs.root-sol }} --magisk-custom
+        # chmod +x build.sh
+        ./build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --gapps-brand ${{ inputs.gapps-brand }} --gapps-variant ${{ inputs.gapps-variant }} --root-sol ${{ inputs.root-sol }} --magisk-custom
 
     - uses: actions/upload-artifact@v3
       with:
