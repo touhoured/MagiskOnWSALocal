@@ -140,7 +140,7 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: MagiskOnWSA
-        path: output
+        path: output/*
 
     - name: Get current time
       uses: srfrnk/current-time@master
@@ -152,4 +152,4 @@ jobs:
       with:
         name: archive-${{ steps.current-time.outputs.formattedTime }}
         tag_name: archive-${{ steps.current-time.outputs.formattedTime }}
-        files: output/*.7z
+        files: output/*
