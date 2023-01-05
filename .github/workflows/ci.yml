@@ -6,12 +6,31 @@ on:
   workflow_dispatch:
     inputs:
       arch:
-        description: 'arch Type'
+        description: 'Architecture of WSA'
         required: true
         type: choice
         options:
         - 'x64'
         - 'arm64'
+      release-type:
+        description: 'Release type of WSA'
+        required: true
+        type: choice
+        options:
+        - 'retail'
+        - 'RP'
+        - WIS
+        - WIF
+      magisk-ver:
+        description: 'Release type'
+        required: true
+        type: choice
+        options:
+        - 'retail'
+        - 'RP'
+        - WIS
+        - WIF
+
       root:
         description: 'root Type'
         required: true
@@ -39,18 +58,28 @@ jobs:
       run: |
         mkdir download
         curl https://raw.githubusercontent.com/vvb2060/magisk_files/alpha/app-release.apk -o download/app-debug.apk
-    - name: Install dependencies
-      run : sudo apt install setools lzip wine patchelf e2fsprogs aria2 python3 attr
-    - name: Build
+    - name: Install Dependencies
       run: |
-        cd scripts
-        sudo ./build.sh --remove-amazon --compress --magisk-custom --release-type WIF
-    - name: Package
-      run: 7z a MagiskOnWSA.7z output
+        sudo apt-get update
+        sudo apt-get install -y whiptail setools lzip wine winetricks patchelf e2fsprogs python3-pip aria2 p7zip-full attr
+        pip list --disable-pip-version-check | grep -E "^requests " >/dev/null 2>&1 || python3 -m pip install requests
+        winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
+
+    - name: Clone MagiskOnWSALocal source code
+      run: |
+        git clone --depth 1 https://github.com/LSPosed/MagiskOnWSALocal.git wsaworkdir
+
+    - name: Build
+      working-directory: wsaworkdir
+      run: |
+        sudo ./scripts/build.sh --arch ${{ inputs.arch }} --remove-amazon --compress --compress-format 7z --magisk-custom --release-type WIF
     - uses: actions/upload-artifact@v3
       with:
         name: MagiskOnWSA
         path: output
+
+    - name: Package
+      run: 7z a MagiskOnWSA.7z output
     - name: Get current time
       uses: srfrnk/current-time@master
       id: current-time
