@@ -108,24 +108,6 @@ on:
 
 
 jobs:
-  sync:
-    name: Sync
-    runs-on: ubuntu-latest
-    if: inputs.skip_sync != true
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: main
-      - name: Sync
-        env:
-          upstream_repo: LSPosed/MagiskOnWSALocal
-        run: |
-          git remote add upstream https://github.com/$upstream_repo.git
-          git fetch upstream
-          hash=$(git log --all --pretty=format:'%H' -n 1)
-          git reset --hard $hash
-          git push
-          git push --tags
 
   build:
 
