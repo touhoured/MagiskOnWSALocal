@@ -27,11 +27,11 @@ on:
         description: Magisk
         required: true
         type: choice
-        default: delte
+        default: delta
         options:
         - official
         - alpha
-        - delte
+        - delta
       magisk-ver:
         description: Magisk version
         required: true
@@ -121,7 +121,7 @@ jobs:
           link=https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-${{ inputs.magisk-var }}.apk
         elif [ ${{ inputs.magisk }} = alpha ]; then
           link=https://raw.githubusercontent.com/vvb2060/magisk_files/alpha/app-${{ inputs.magisk-var }}.apk
-        elif [ ${{ inputs.magisk }} = delte ]; then
+        elif [ ${{ inputs.magisk }} = delta ]; then
           link=https://raw.githubusercontent.com/HuskyDG/magisk-files/main/app-${{ inputs.magisk-var }}.apk
         fi
         curl $link -o download/magisk-stable.zip
