@@ -32,7 +32,7 @@ on:
         description: Magisk
         required: true
         type: choice
-        default: alpha
+        default: delte
         options:
         - official
         - alpha
@@ -117,6 +117,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
+        repository: LSPosed/MagiskOnWSALocal
         ref: main
     - name: Get Magisk official
       run: |
@@ -127,6 +128,7 @@ jobs:
           link=https://raw.githubusercontent.com/vvb2060/magisk_files/alpha/app-${{ inputs.magisk-var }}.apk
         elif [ ${{ inputs.magisk }} = delte ]; then
           link=https://raw.githubusercontent.com/HuskyDG/magisk-files/main/app-${{ inputs.magisk-var }}.apk
+        fi
         curl $link -o download/
     - name: Install Dependencies
       run: |
