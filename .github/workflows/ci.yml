@@ -5,6 +5,11 @@ on:
     - cron: "0 6 * * 3"
   workflow_dispatch:
     inputs:
+      skip_sync:
+        description: "Skip sync"
+        required: false
+        default: true
+        type: boolean
       arch:
         description: Architecture of WSA
         required: true
@@ -36,13 +41,10 @@ on:
         description: Magisk version
         required: true
         type: choice
-        default: stable
+        default: release
         options:
-        - stable
-        - beta
-        - canary
-        - debug
         - release
+        - debug
       gapps-brand:
         description: GApps brand
         required: true
@@ -106,6 +108,25 @@ on:
 
 
 jobs:
+  sync:
+    name: Sync
+    runs-on: ubuntu-latest
+    if: inputs.skip_sync != true
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: main
+      - name: Sync
+        env:
+          upstream_repo: LSPosed/MagiskOnWSALocal
+        run: |
+          git remote add upstream https://github.com/$upstream_repo.git
+          git fetch upstream
+          hash=$(git log --all --pretty=format:'%H' -n 1)
+          git reset --hard $hash
+          git push
+          git push --tags
+
   build:
 
     runs-on: ubuntu-latest
@@ -113,25 +134,28 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Get Magisk alpha
+      with:
+        ref: main
+    - name: Get Magisk official
       run: |
         mkdir download
-        curl https://raw.githubusercontent.com/vvb2060/magisk_files/alpha/app-release.apk -o download/app-debug.apk
+        if [ ${{ inputs.magisk }} = official ]; then
+          link=https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-${{ intputs.magisk-var }}.apk
+        elif [ ${{ inputs.magisk }} = alpha ]; then
+          link=https://raw.githubusercontent.com/vvb2060/magisk_files/alpha/app-${{ intputs.magisk-var }}.apk
+        elif [ ${{ inputs.magisk }} = delte ]; then
+          link=https://raw.githubusercontent.com/HuskyDG/magisk-files/main/app-${{ intputs.magisk-var }}.apk
+        curl $link -o download/
     - name: Install Dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y whiptail setools lzip wine winetricks patchelf e2fsprogs python3-pip aria2 p7zip-full attr
+        sudo apt update
+        sudo apt install -y whiptail setools lzip wine winetricks patchelf e2fsprogs python3-pip aria2 p7zip-full attr
         pip list --disable-pip-version-check | grep -E "^requests " >/dev/null 2>&1 || python3 -m pip install requests
         winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
 
-    - name: Clone MagiskOnWSALocal source code
-      run: |
-        git clone --depth 1 https://github.com/LSPosed/MagiskOnWSALocal.git wsaworkdir
-
     - name: Build
-      working-directory: wsaworkdir
       run: |
-        sudo ./scripts/build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --gapps-brand ${{ inputs.gapps-brand }} --gapps-variant ${{ inputs.gapps-variant }} --root-sol ${{ inputs.root-sol }}
+        sudo ./scripts/build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --gapps-brand ${{ inputs.gapps-brand }} --gapps-variant ${{ inputs.gapps-variant }} --root-sol ${{ inputs.root-sol }} --magisk-custom
 
     - uses: actions/upload-artifact@v3
       with:
