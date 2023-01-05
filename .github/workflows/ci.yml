@@ -139,6 +139,7 @@ jobs:
     - name: Build
       working-directory: scripts
       run: |
+        ls -lha build.sh
         # chmod +x build.sh
         ./build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --gapps-brand ${{ inputs.gapps-brand }} --gapps-variant ${{ inputs.gapps-variant }} --root-sol ${{ inputs.root-sol }} --compress-format ${{ inputs.compress-format }} --compress --magisk-custom
 
