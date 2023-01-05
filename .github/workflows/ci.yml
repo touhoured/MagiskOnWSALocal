@@ -1,0 +1,64 @@
+name: ci
+
+on:
+  schedule:
+    - cron: "0 6 * * 3"
+  workflow_dispatch:
+    inputs:
+      arch:
+        description: 'arch Type'
+        required: true
+        type: choice
+        options:
+        - 'x64'
+        - 'arm64'
+      root:
+        description: 'root Type'
+        required: true
+        type: choice
+        options:
+        - 'none'
+        - 'magisk'
+      release:
+        description: 'release version'
+        required: true
+        type: choice
+        options:
+        - 'RP'
+        - 'retail'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Get Magisk alpha
+      run: |
+        mkdir download
+        curl https://raw.githubusercontent.com/vvb2060/magisk_files/alpha/app-release.apk -o download/app-debug.apk
+    - name: Install dependencies
+      run : sudo apt install setools lzip wine patchelf e2fsprogs aria2 python3 attr
+    - name: Build
+      run: |
+        cd scripts
+        sudo ./build.sh --remove-amazon --compress --magisk-custom --release-type WIF
+    - name: Package
+      run: 7z a MagiskOnWSA.7z output
+    - uses: actions/upload-artifact@v3
+      with:
+        name: MagiskOnWSA
+        path: output
+    - name: Get current time
+      uses: srfrnk/current-time@master
+      id: current-time
+      with:
+        format: YYYY.MM.DD
+    - name: archive
+      uses: softprops/action-gh-release@v1
+      with:
+        name: archive-${{ steps.current-time.outputs.formattedTime }}
+        tag_name: archive-${{ steps.current-time.outputs.formattedTime }}
+        files: MagiskOnWSA.7z
