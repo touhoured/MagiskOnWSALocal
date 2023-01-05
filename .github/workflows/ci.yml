@@ -124,7 +124,7 @@ jobs:
         elif [ ${{ inputs.magisk }} = delte ]; then
           link=https://raw.githubusercontent.com/HuskyDG/magisk-files/main/app-${{ inputs.magisk-var }}.apk
         fi
-        curl $link -o download/app-${{ inputs.magisk-var }}.apk
+        curl $link -o download/magisk-stable.zip
     - name: Install Dependencies
       run: |
         sudo apt update
