@@ -71,15 +71,15 @@ on:
         options:
         - none
         - magisk
-      # compress-format:
-      #   description: Compress format of output file
-      #   required: true
-      #   type: choice
-      #   default: 7z
-      #   options:
-      #   - 7z
-      #   - xz
-      #   - zip
+      compress-format:
+        description: Compress format of output file
+        required: true
+        type: choice
+        default: 7z
+        options:
+        - 7z
+        - xz
+        - zip
       # remove-amazon:
       #   description: Remove Amazon Appstore from the system
       #   required: true
@@ -140,7 +140,7 @@ jobs:
       working-directory: scripts
       run: |
         # chmod +x build.sh
-        ./build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --gapps-brand ${{ inputs.gapps-brand }} --gapps-variant ${{ inputs.gapps-variant }} --root-sol ${{ inputs.root-sol }} --magisk-custom
+        ./build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --gapps-brand ${{ inputs.gapps-brand }} --gapps-variant ${{ inputs.gapps-variant }} --root-sol ${{ inputs.root-sol }} --compress-format ${{ inputs.compress-format }} --compress --magisk-custom
 
     - uses: actions/upload-artifact@v3
       with:
