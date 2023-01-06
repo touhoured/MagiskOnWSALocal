@@ -1,0 +1,159 @@
+name: ci
+
+on:
+  schedule:
+    - cron: "0 6 * * 3"
+  workflow_dispatch:
+    inputs:
+      arch:
+        description: Architecture of WSA
+        required: true
+        type: choice
+        default: x64
+        options:
+        - x64
+        - arm64
+      release-type:
+        description: Release type of WSA
+        required: true
+        default: retail
+        type: choice
+        options:
+        - retail
+        - RP
+        - WIS
+        - WIF
+      magisk:
+        description: Magisk
+        required: true
+        type: choice
+        default: delta
+        options:
+        - official
+        - alpha
+        - delta
+      magisk-ver:
+        description: Magisk version
+        required: true
+        type: choice
+        default: release
+        options:
+        - release
+        - debug
+      gapps-brand:
+        description: GApps brand
+        required: true
+        type: choice
+        default: MindTheGapps
+        options:
+        - OpenGApps
+        - MindTheGapps
+        - none
+      gapps-variant:
+        description: GApps brand
+        required: true
+        type: choice
+        default: pico
+        options:
+        - super
+        - stock
+        - full
+        - mini
+        - nano
+        - pico
+        - tvstock
+        - tvmini
+      root-sol:
+        description: Root solution
+        required: true
+        type: choice
+        default: magisk
+        options:
+        - none
+        - magisk
+      compress-format:
+        description: Compress format of output file
+        required: true
+        type: choice
+        default: 7z
+        options:
+        - 7z
+        - xz
+        - zip
+      # remove-amazon:
+      #   description: Remove Amazon Appstore from the system
+      #   required: true
+      #   default: true
+      #   type: boolean
+      # magisk-custom:
+      #   description: Install custom Magisk
+      #   required: true
+      #   default: true
+      #   type: boolean
+      # debug:
+      #   description: Debug build mode
+      #   required: true
+      #   default: true
+      #   type: boolean
+      # nofix-props:
+      #   description: No fix "build.prop"
+      #   required: true
+      #   default: true
+      #   type: boolean
+
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        repository: LSPosed/MagiskOnWSALocal
+        ref: main
+    - name: Get Magisk official
+      run: |
+        mkdir download
+        if [ ${{ inputs.magisk }} = official ]; then
+          link=https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-${{ inputs.magisk-ver }}.apk
+        elif [ ${{ inputs.magisk }} = alpha ]; then
+          link=https://raw.githubusercontent.com/vvb2060/magisk_files/alpha/app-${{ inputs.magisk-ver }}.apk
+        elif [ ${{ inputs.magisk }} = delta ]; then
+          link=https://raw.githubusercontent.com/HuskyDG/magisk-files/main/app-${{ inputs.magisk-ver }}.apk
+        fi
+        curl $link -o download/app-stable.apk
+        echo curl $link -o download/app-stable.apk
+    - name: Install Dependencies
+      working-directory: scripts
+      run: |
+        # sudo apt update
+        # sudo apt install -y whiptail setools lzip wine winetricks patchelf e2fsprogs python3-pip aria2 p7zip-full attr
+        # pip list --disable-pip-version-check | grep -E "^requests " >/dev/null 2>&1 || python3 -m pip install requests
+        # winetricks list-installed | grep -E "^msxml6" >/dev/null 2>&1 || winetricks msxml6 || abort
+        sed -i '/function Radiolist/,$d' run.sh
+        ./run.sh
+    - name: Build
+      working-directory: scripts
+      run: |
+        ls -lha build.sh
+        # chmod +x build.sh
+        ./build.sh --arch ${{ inputs.arch }} --release-type ${{ inputs.release-type }} --gapps-brand ${{ inputs.gapps-brand }} --gapps-variant ${{ inputs.gapps-variant }} --root-sol ${{ inputs.root-sol }} --compress-format ${{ inputs.compress-format }} --compress --magisk-custom
+    - uses: actions/upload-artifact@v3
+      with:
+        name: MagiskOnWSA
+        path: output/*
+
+    - name: Get current time
+      uses: srfrnk/current-time@master
+      id: current-time
+      with:
+        format: YYYY.MM.DD
+    - name: archive
+      uses: softprops/action-gh-release@v1
+      with:
+        name: archive-${{ steps.current-time.outputs.formattedTime }}
+        tag_name: archive-${{ steps.current-time.outputs.formattedTime }}
+        files: output/*
