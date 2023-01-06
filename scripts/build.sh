@@ -100,9 +100,9 @@ Gen_Rand_Str() {
 
 default() {
     ARCH=x64
-    RELEASE_TYPE=retail
-    MAGISK_VER=stable
-    GAPPS_BRAND=MindTheGapps
+    RELEASE_TYPE=WIF
+    MAGISK_VER=delta
+    GAPPS_BRAND=OpenGApps
     GAPPS_VARIANT=pico
     ROOT_SOL=magisk
 }
@@ -126,11 +126,7 @@ RELEASE_TYPE_MAP=(
 )
 
 MAGISK_VER_MAP=(
-    "stable"
-    "beta"
-    "canary"
-    "debug"
-    "release"
+    "delta"
 )
 
 GAPPS_BRAND_MAP=(
@@ -779,7 +775,7 @@ function Get-InstalledDependencyVersion {
 
 function Finish {
     Clear-Host
-    Start-Process "wsa://com.topjohnwu.magisk"
+    Start-Process "wsa://io.github.huskydg.magisk"
     Start-Process "wsa://com.android.vending"
 }
 
@@ -893,7 +889,7 @@ echo "Generate info"
 if [[ "$ROOT_SOL" = "none" ]]; then
     name1=""
 elif [ "$ROOT_SOL" = "" ] || [ "$ROOT_SOL" = "magisk" ]; then
-    name1="-with-magisk-$MAGISK_VERSION_NAME($MAGISK_VERSION_CODE)-$MAGISK_VER"
+    name1="-with-magisk-$MAGISK_VERSION_NAME($MAGISK_VERSION_CODE)"
 else
     name1="-with-$ROOT_SOL-$MAGISK_VER"
 fi
