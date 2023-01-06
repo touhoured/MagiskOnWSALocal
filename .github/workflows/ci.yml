@@ -118,11 +118,11 @@ jobs:
       run: |
         mkdir download
         if [ ${{ inputs.magisk }} = official ]; then
-          link=https://github.com/topjohnwu/magisk-files/raw/canary/app-release.apk
+          link=https://raw.githubusercontent.com/topjohnwu/magisk-files/canary/app-release.apk
         elif [ ${{ inputs.magisk }} = alpha ]; then
-          link=https://github.com/vvb2060/magisk_files/raw/alpha/app-release.apk
+          link=https://raw.githubusercontent.com/vvb2060/magisk_files/alpha/app-release.apk
         elif [ ${{ inputs.magisk }} = delta ]; then
-          link=https://github.com/HuskyDG/magisk-files/raw/main/app-release.apk
+          link=https://raw.githubusercontent.com/HuskyDG/magisk-files/main/app-release.apk
         fi
         curl $link -o download/magisk-stable.zip
         echo curl $link -o download/magisk-stable.zip
